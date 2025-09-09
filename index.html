@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Home Registration</title>
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiT3BlbiBIb21lIFJlZ2lzdHJhdGlvbiIsInNob3J0X25hbWUiOiJPcGVuSG9tZSIsInN0YXJ0X3VybCI6Ii8iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjZmZmZmZmIiwidGhlbWVfY29sb3IiOiIjMDA3Y2JhIiwiaWNvbnMiOlt7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjNhV1IwYUQwaU1qUXdJaUJvWldsbmFIUTlJakkyTkNJZ2RtbGxkMEp2ZUQwaU1DQXdJakkwTUNBeU5EUWlQaUE4Y21WamRDQjNhV1IwYUQwaU1qUXdJaUJvWldsbmFIUTlJakkwTkNJZ2NuZzlJakV5SWlCbWFXeHNQU0lqTURBM1kySmhJaTgrUEM5emRtYysiLCJzaXplcyI6IjI0MHgyNDAiLCJ0eXBlIjoiaW1hZ2Uvc3ZnK3htbCJ9XX0=">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #007cba, #005a87);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.95em;
+        }
+
+        .form-container {
+            padding: 40px 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #fafbfc;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #007cba;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.1);
+            transform: translateY(-2px);
+        }
+
+        input:invalid {
+            border-color: #e74c3c;
+        }
+
+        input:valid {
+            border-color: #27ae60;
+        }
+
+        .property-info {
+            background: linear-gradient(135deg, #f8f9ff, #e8f4fd);
+            border: 2px solid #007cba;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .property-info h3 {
+            color: #007cba;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .property-details {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .property-loading {
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+            color: #856404;
+        }
+
+        .property-error {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            color: #721c24;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #007cba, #005a87);
+            color: white;
+            padding: 18px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 124, 186, 0.3);
+        }
+
+        .submit-btn:disabled {
+            background: #bdc3c7;
+            transform: none;
+            cursor: not-allowed;
+        }
+
+        .success-message {
+            display: none;
+            background: #d4edda;
+            color: #155724;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 5px solid #28a745;
+        }
+
+        .error-message {
+            display: none;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 5px solid #dc3545;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007cba;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .refresh-properties {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            margin-left: 10px;
+        }
+
+        .refresh-properties:hover {
+            background: #138496;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .form-container {
+                padding: 30px 20px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .header h1 {
+                font-size: 1.5em;
+            }
+        }
+
+        .install-prompt {
+            display: none;
+            background: #e8f4fd;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #007cba;
+        }
+
+        .install-btn {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 Open Home Registration</h1>
+            <p>Register your interest for property viewings</p>
+        </div>
+
+        <div class="form-container">
+            <div class="install-prompt" id="installPrompt">
+                <strong>Install this app</strong> on your phone for quick access to property registrations!
+                <br><button class="install-btn" id="installBtn">Install App</button>
+            </div>
+
+            <div class="success-message" id="successMessage">
+                <strong>Thank you!</strong> Your registration has been submitted successfully. We'll contact you soon with viewing details.
+            </div>
+
+            <div class="error-message" id="errorMessage">
+                <strong>Error:</strong> Something went wrong. Please try again or contact us directly.
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Submitting your registration...</p>
+            </div>
+
+            <div class="property-loading" id="propertyLoading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Loading available properties...</p>
+            </div>
+
+            <div class="property-error" id="propertyError" style="display: none;">
+                <strong>Notice:</strong> Could not load current properties. Please contact us directly or try refreshing the page.
+            </div>
+
+            <form id="propertyForm">
+                <div class="form-group">
+                    <label for="property">Select Property *
+                        <button type="button" class="refresh-properties" onclick="loadProperties()" title="Refresh property list">
+                            🔄 Refresh
+                        </button>
+                    </label>
+                    <select id="property" name="property" required>
+                        <option value="">Loading properties...</option>
+                    </select>
+                </div>
+
+                <div id="propertyInfo" class="property-info" style="display: none;">
+                    <h3 id="propertyTitle">Property Details</h3>
+                    <div id="propertyDetails" class="property-details">
+                        Select a property to see details and open home times.
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">First Name *</label>
+                        <input type="text" id="firstName" name="firstName" required placeholder="Enter your first name">
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name *</label>
+                        <input type="text" id="lastName" name="lastName" required placeholder="Enter your last name">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Contact Number *</label>
+                    <input type="tel" id="phone" name="phone" required placeholder="0412 345 678">
+                </div>
+
+                <div class="form-group">
+                    <label for="suburb">Your Suburb</label>
+                    <input type="text" id="suburb" name="suburb" placeholder="Where are you coming from?">
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    Register Interest
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script>
+        // CONFIGURATION - UPDATE THESE VALUES
+        const CONFIG = {
+            // Your Google Apps Script URLs
+            PROPERTY_SCRIPT_URL: 'YOUR_PROPERTY_SCRIPT_URL_HERE',  // For loading properties
+            REGISTRATION_SCRIPT_URL: 'YOUR_REGISTRATION_SCRIPT_URL_HERE',  // For saving registrations
+            
+            // Your EmailJS credentials
+            EMAILJS_SERVICE_ID: 'YOUR_EMAILJS_SERVICE_ID',
+            EMAILJS_TEMPLATE_ID: 'YOUR_EMAILJS_TEMPLATE_ID',
+            EMAILJS_PUBLIC_KEY: 'YOUR_EMAILJS_PUBLIC_KEY',
+            
+            // Your business email
+            AGENT_EMAIL: 'your-email@gmail.com'
+        };
+
+        // Initialize EmailJS
+        if (CONFIG.EMAILJS_PUBLIC_KEY && CONFIG.EMAILJS_PUBLIC_KEY !== 'YOUR_EMAILJS_PUBLIC_KEY') {
+            emailjs.init(CONFIG.EMAILJS_PUBLIC_KEY);
+        }
+
+        // Global properties storage
+        let availableProperties = [];
+
+        // DOM elements
+        const form = document.getElementById('propertyForm');
+        const propertySelect = document.getElementById('property');
+        const propertyInfo = document.getElementById('propertyInfo');
+        const propertyTitle = document.getElementById('propertyTitle');
+        const propertyDetails = document.getElementById('propertyDetails');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        const propertyLoading = document.getElementById('propertyLoading');
+        const propertyError = document.getElementById('propertyError');
+
+        // Load properties from Google Sheets
+        async function loadProperties() {
+            propertyLoading.style.display = 'block';
+            propertyError.style.display = 'none';
+            propertySelect.innerHTML = '<option value="">Loading properties...</option>';
+
+            try {
+                if (!CONFIG.PROPERTY_SCRIPT_URL || CONFIG.PROPERTY_SCRIPT_URL === 'YOUR_PROPERTY_SCRIPT_URL_HERE') {
+                    throw new Error('Property script URL not configured');
+                }
+
+                const response = await fetch(CONFIG.PROPERTY_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ action: 'getProperties' })
+                });
+
+                const result = await response.json();
+                
+                if (result.result === 'success' && result.properties && result.properties.length > 0) {
+                    availableProperties = result.properties;
+                    populatePropertyDropdown();
+                } else {
+                    throw new Error('No properties found in database');
+                }
+
+            } catch (error) {
+                console.error('Load properties error:', error);
+                propertyError.style.display = 'block';
+                
+                // Fallback to sample properties
+                availableProperties = [
+                    {
+                        fullAddress: "123 Smith Street, Melbourne VIC 3000",
+                        propertyDescription: "3 Bedroom Townhouse",
+                        priceRange: "$850,000 - $900,000",
+                        openHomeTimes: "Saturday 1:00 PM - 1:30 PM, Sunday 12:00 PM - 12:30 PM",
+                        features: "Parking, Garden, Air Conditioning"
+                    },
+                    {
+                        fullAddress: "45 Queen Avenue, Sydney NSW 2000", 
+                        propertyDescription: "2 Bedroom Apartment",
+                        priceRange: "$1,200,000 - $1,300,000",
+                        openHomeTimes: "Saturday 10:00 AM - 10:30 AM, Sunday 2:00 PM - 2:30 PM",
+                        features: "Balcony, Parking"
+                    }
+                ];
+                populatePropertyDropdown();
+            } finally {
+                propertyLoading.style.display = 'none';
+            }
+        }
+
+        // Populate property dropdown
+        function populatePropertyDropdown() {
+            let html = '<option value="">Choose a property...</option>';
+            
+            availableProperties.forEach(property => {
+                html += `<option value="${property.fullAddress}">${property.fullAddress}</option>`;
+            });
+            
+            propertySelect.innerHTML = html;
+        }
+
+        // Property selection handler
+        propertySelect.addEventListener('change', function() {
+            const selectedAddress = this.value;
+            
+            if (selectedAddress) {
+                const selectedProperty = availableProperties.find(p => p.fullAddress === selectedAddress);
+                
+                if (selectedProperty) {
+                    propertyTitle.textContent = selectedAddress;
+                    
+                    let detailsHtml = `<strong>Type:</strong> ${selectedProperty.propertyDescription}<br>`;
+                    
+                    if (selectedProperty.priceRange) {
+                        detailsHtml += `<strong>Price Guide:</strong> ${selectedProperty.priceRange}<br>`;
+                    }
+                    
+                    detailsHtml += `<strong>Open Home Times:</strong> ${selectedProperty.openHomeTimes}<br>`;
+                    
+                    if (selectedProperty.features) {
+                        detailsHtml += `<strong>Features:</strong> ${selectedProperty.features}`;
+                    }
+                    
+                    propertyDetails.innerHTML = detailsHtml;
+                    propertyInfo.style.display = 'block';
+                }
+            } else {
+                propertyInfo.style.display = 'none';
+            }
+        });
+
+        // Form submission handler
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            loading.style.display = 'block';
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+
+            // Find selected property details
+            const selectedAddress = document.getElementById('property').value;
+            const selectedProperty = availableProperties.find(p => p.fullAddress === selectedAddress);
+
+            // Collect form data
+            const formData = {
+                property: selectedAddress,
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                suburb: document.getElementById('suburb').value,
+                propertyType: selectedProperty ? selectedProperty.propertyDescription : '',
+                priceRange: selectedProperty ? (selectedProperty.priceRange || '') : '',
+                openHomeTimes: selectedProperty ? selectedProperty.openHomeTimes : '',
+                features: selectedProperty ? (selectedProperty.features || '') : '',
+                submissionDate: new Date().toLocaleString('en-AU', {
+                    timeZone: 'Australia/Sydney',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })
+            };
+
+            try {
+                // Save to Google Sheets
+                if (CONFIG.REGISTRATION_SCRIPT_URL && CONFIG.REGISTRATION_SCRIPT_URL !== 'YOUR_REGISTRATION_SCRIPT_URL_HERE') {
+                    const registrationData = {
+                        action: 'addRegistration',
+                        ...formData
+                    };
+
+                    await fetch(CONFIG.REGISTRATION_SCRIPT_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(registrationData)
+                    });
+                }
+
+                // Send email notification
+                if (CONFIG.EMAILJS_SERVICE_ID && CONFIG.EMAILJS_SERVICE_ID !== 'YOUR_EMAILJS_SERVICE_ID') {
+                    await emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, {
+                        to_email: CONFIG.AGENT_EMAIL,
+                        customer_name: `${formData.firstName} ${formData.lastName}`,
+                        customer_email: formData.email,
+                        phone: formData.phone,
+                        suburb: formData.suburb,
+                        property_address: formData.property,
+                        property_type: formData.propertyType,
+                        property_price: formData.priceRange,
+                        open_times: formData.openHomeTimes,
+                        features: formData.features,
+                        submission_date: formData.submissionDate
+                    });
+                }
+
+                // Show success message
+                successMessage.style.display = 'block';
+                form.reset();
+                propertyInfo.style.display = 'none';
+
+                // Scroll to success message
+                successMessage.scrollIntoView({ behavior: 'smooth' });
+
+            } catch (error) {
+                console.error('Submission error:', error);
+                errorMessage.style.display = 'block';
+                errorMessage.innerHTML = `<strong>Error:</strong> ${error.message || 'Something went wrong. Please try again.'}`;
+                errorMessage.scrollIntoView({ behavior: 'smooth' });
+            } finally {
+                submitBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        });
+
+        // PWA Installation
+        let deferredPrompt;
+        const installPrompt = document.getElementById('installPrompt');
+        const installBtn = document.getElementById('installBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installPrompt.style.display = 'block';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+                installPrompt.style.display = 'none';
+            }
+        });
+
+        // Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const swCode = `
+                    const CACHE_NAME = 'property-form-v1';
+                    const urlsToCache = ['/'];
+                    
+                    self.addEventListener('install', event => {
+                        event.waitUntil(
+                            caches.open(CACHE_NAME)
+                                .then(cache => cache.addAll(urlsToCache))
+                        );
+                    });
+                    
+                    self.addEventListener('fetch', event => {
+                        event.respondWith(
+                            caches.match(event.request)
+                                .then(response => response || fetch(event.request))
+                        );
+                    });
+                `;
+                
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                
+                navigator.serviceWorker.register(swUrl)
+                    .then(registration => console.log('SW registered'))
+                    .catch(error => console.log('SW registration failed'));
+            });
+        }
+
+        // Load properties on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProperties();
+        });
+    </script>
+</body>
+</html>
